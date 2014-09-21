@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 from urllib2 import urlopen
 import json
+import csv
 
 BASE_URL = "http://www.boxofficemojo.com"
 FRANCHISE_URL = "/franchises/chart/?id=avengers.htm"
@@ -16,17 +17,24 @@ def get_movie_links(soup):
              "title": link.text}
              for link in worldwide.find_all("a")]
 
-def get_weekly_gross(soup):
+def get_weekly_gross(soup, title):
     weekly_rows = soup.find("table", "chart-wide").find_all("tr")
     weekly_rows.pop(0)
-    return [{"date" : data.find_all("td")[0].text,
+    return [{"title": title,
+             "date" : data.find_all("td")[0].text.replace(u"\x96", " - "),
              "gross": data.find_all("td")[2].text}
             for data in weekly_rows]
 
 def get_all_weekly(soup):
-    for data in get_movie_links(soup):
-        url = data.get("link")
-        title = data.get("title")
-        print get_weekly_gross(get_soup(url))
+    results = [get_weekly_gross(get_soup(data.get("link")), data.get("title"))
+                for data in get_movie_links(soup)]
+    return [val for result in results for val in result]
 
-print get_all_weekly(get_soup(FRANCHISE_URL))
+def save_json():
+    json_data = json.dumps(get_all_weekly(get_soup(FRANCHISE_URL)))
+    f = open("data.json", "w+")
+    f.write(json_data)
+    f.close()
+
+if __name__ == "__main__":
+    save_json()
