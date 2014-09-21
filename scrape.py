@@ -35,6 +35,7 @@ def save_json():
     f = open("data.json", "w+")
     f.write(json_data)
     f.close()
+    print "Save to json file data.json"
 
 if __name__ == "__main__":
     save_json()
