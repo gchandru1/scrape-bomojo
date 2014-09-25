@@ -6,7 +6,7 @@ Scraper for Marvel Box office mojo data
 ####Install Reqts
 
 ```
-pip install -e requirements.txt
+pip install -r requirements.txt
 ```
 
 ####Run scraper
