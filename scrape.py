@@ -33,14 +33,17 @@ def get_all_weekly(soup):
 
 def get_country_gross(soup, title):
     try:
-        country_rows = soup.find(id="body").find_all("table")[4].find("table").find_all("tr")
+        country_table = soup.find(id="body").find_all("table")[4].find("table")
+        if country_table == None:
+            country_table = soup.find(id="body").find_all("table")[5].find("table")
+        country_rows = country_table.find_all("tr")
         [country_rows.pop(0) for i in range(3)]
         return [{"title": title,
                  "country": data.find_all("td")[0].text,
                  "gross" : data.find_all("td")[5].text} 
                  for data in country_rows]
     except Exception, e:
-        pass
+        print e
     
 def get_all_country(soup):
     results = [get_country_gross(get_soup(data.get("link")+"&page=intl"), data.get("title"))
